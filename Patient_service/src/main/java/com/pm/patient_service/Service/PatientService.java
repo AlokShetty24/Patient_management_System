@@ -2,6 +2,7 @@ package com.pm.patient_service.Service;
 
 import com.pm.patient_service.DTO.PatientRequestDTO;
 import com.pm.patient_service.DTO.PatientResponseDTO;
+import com.pm.patient_service.Exceptions.EmailAlreadyExistsException;
 import com.pm.patient_service.Repository.PatientRepository;
 import com.pm.patient_service.mapper.PatientMapper;
 import com.pm.patient_service.model.Patient;
@@ -18,15 +19,18 @@ public class PatientService {
         this.patientRepository = patientRepository;
     }
 
-    public List<PatientResponseDTO> getPatients(){
+    public List<PatientResponseDTO> getPatients() {
         List<Patient> patients = patientRepository.findAll();
-        List<PatientResponseDTO> patientResponseDTOS=patients.stream().map(patient-> PatientMapper.toDTO(patient)).toList();
+        List<PatientResponseDTO> patientResponseDTOS = patients.stream().map(patient -> PatientMapper.toDTO(patient)).toList();
         return patientResponseDTOS;
     }
 
-    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
 
-        Patient patient =patientRepository.save( PatientMapper.toModel(patientRequestDTO));
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
+        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException("A patient Email already exists"+patientRequestDTO.getEmail());
+        }
+        Patient patient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
         return PatientMapper.toDTO(patient);
     }
 }
