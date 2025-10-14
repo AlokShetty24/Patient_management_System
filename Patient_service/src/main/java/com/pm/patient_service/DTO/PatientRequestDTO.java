@@ -1,12 +1,13 @@
 package com.pm.patient_service.DTO;
 
+import com.pm.patient_service.DTO.Validators.CreatepatientValidationGroup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class PatientRequestDTO {
-    @NotBlank(message="Name is Required")
-    @Size(max=100,message="Name cannot exceed 100 CHARACTERS")
+    @NotBlank(message = "Name is Required")
+    @Size(max = 100, message = "Name cannot exceed 100 CHARACTERS")
     private String name;
 
     @NotBlank(message = "Email is required")
@@ -19,7 +20,7 @@ public class PatientRequestDTO {
     @NotBlank(message = "DOB is required")
     private String dateOfBirth;
 
-    @NotBlank(message = "registeredDate is required")
+    @NotBlank(groups = CreatepatientValidationGroup.class, message = "registeredDate is required")
     private String registeredDate;
 
     public String getName() {

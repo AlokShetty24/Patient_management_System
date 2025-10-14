@@ -8,6 +8,7 @@ Content-Type: application/json
   "address": "123 abc cdwe",
   "dateOfBirth": "2002-06-24",
   "registeredDate": "2006-06-24"
+
 }
 
 ###
