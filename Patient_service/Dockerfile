@@ -26,7 +26,7 @@ FROM openjdk:21-jdk AS runner
 WORKDIR /app
 
 # Copy the built JAR file from the builder stage to the runtime stage
-COPY --from=builder ./app/target/patient-service-0.0.1-SNAPSHOT.jar ./app.jar
+COPY --from=builder /app/target/*.jar ./app.jar
 
 # Expose the application port (use the same port configured in Spring Boot)
 EXPOSE 4000
