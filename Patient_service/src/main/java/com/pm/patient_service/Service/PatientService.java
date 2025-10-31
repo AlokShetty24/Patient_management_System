@@ -4,6 +4,7 @@ import com.pm.patient_service.DTO.PatientRequestDTO;
 import com.pm.patient_service.DTO.PatientResponseDTO;
 import com.pm.patient_service.Exceptions.EmailAlreadyExistsException;
 import com.pm.patient_service.Exceptions.PatientNotFoundExcepion;
+import com.pm.patient_service.Kafka.KafkaProducer;
 import com.pm.patient_service.Repository.PatientRepository;
 import com.pm.patient_service.grpc.BillingServicegrpcClient;
 import com.pm.patient_service.mapper.PatientMapper;
@@ -17,13 +18,15 @@ import java.util.UUID;
 
 @Service
 public class PatientService {
+    private final KafkaProducer kafkaProducer;
+    private final BillingServicegrpcClient billingServicegrpcClient;
     private PatientRepository patientRepository;
-    private final BillingServicegrpcClient  billingServicegrpcClient;
 
 
-    public PatientService(PatientRepository patientRepository, BillingServicegrpcClient billingServicegrpcClient) {
+    public PatientService(PatientRepository patientRepository, BillingServicegrpcClient billingServicegrpcClient, KafkaProducer kafkaProducer) {
         this.patientRepository = patientRepository;
         this.billingServicegrpcClient = billingServicegrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public List<PatientResponseDTO> getPatients() {
@@ -38,25 +41,30 @@ public class PatientService {
             throw new EmailAlreadyExistsException("A patient Email already exists" + patientRequestDTO.getEmail());
         }
         Patient patient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
-        billingServicegrpcClient.createBillingAccount(patient.getId().toString(),patient.getName(),patient.getEmail());
+        billingServicegrpcClient.createBillingAccount(patient.getId().toString(), patient.getName(), patient.getEmail());
+
+        kafkaProducer.sentEvent(patient);
+
         return PatientMapper.toDTO(patient);
+
+
     }
 
     public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
         Patient patient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundExcepion("patient not found :" + id));
-        if (patientRepository.existsByEmailAndIdNot(patientRequestDTO.getEmail(),id)) {
+        if (patientRepository.existsByEmailAndIdNot(patientRequestDTO.getEmail(), id)) {
             throw new EmailAlreadyExistsException("A patient Email already exists" + patientRequestDTO.getEmail());
         }
         patient.setName(patientRequestDTO.getName());
         patient.setEmail(patientRequestDTO.getEmail());
         patient.setAddress(patientRequestDTO.getAddress());
         patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
-        Patient updatedPatient =patientRepository.save(patient);
+        Patient updatedPatient = patientRepository.save(patient);
         return PatientMapper.toDTO(updatedPatient);
 
     }
 
-    public  void deletePatient(UUID id) {
+    public void deletePatient(UUID id) {
         patientRepository.deleteById(id);
     }
 }
