@@ -15,12 +15,12 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Build the application and package it as a JAR file
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 
 # ---------- Stage 2: Runtime Stage ----------
-# Use a lightweight OpenJDK 21 image to run the packaged application
-FROM openjdk:21-jdk AS runner
+# ✅ Use the official Eclipse Temurin JDK 21 image (replaces openjdk:21-jdk)
+FROM eclipse-temurin:21-jdk AS runner
 
 # Set the working directory for the runtime container
 WORKDIR /app

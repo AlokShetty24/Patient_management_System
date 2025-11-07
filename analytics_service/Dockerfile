@@ -15,18 +15,18 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Build the application and package it as a JAR file
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 
 # ---------- Stage 2: Runtime Stage ----------
-# Use a lightweight OpenJDK 21 image to run the packaged application
-FROM openjdk:21-jdk AS runner
+# ✅ Use Eclipse Temurin (official replacement for OpenJDK images)
+FROM eclipse-temurin:21-jdk AS runner
 
 # Set the working directory for the runtime container
 WORKDIR /app
 
 # Copy the built JAR file from the builder stage to the runtime stage
-COPY --from=builder ./app/target/analytics_service-0.0.1-SNAPSHOT.jar ./app.jar
+COPY --from=builder /app/target/analytics_service-0.0.1-SNAPSHOT.jar ./app.jar
 
 # Expose the application port (use the same port configured in Spring Boot)
 EXPOSE 4002

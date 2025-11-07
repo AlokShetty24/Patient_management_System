@@ -27,7 +27,7 @@ public class KafkaProducer {
                 .build();
         try
         {
-            kafkaTemplate.send("PATIENT",event.toByteArray());
+            kafkaTemplate.send("patient",event.toByteArray()).get();
         }
         catch (Exception e)
         {

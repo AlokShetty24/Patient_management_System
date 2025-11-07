@@ -26,11 +26,11 @@ FROM eclipse-temurin:21-jdk AS runner
 WORKDIR /app
 
 # Copy the built JAR file from the builder stage to the runtime stage
-COPY --from=builder /app/target/billing-service-0.0.1-SNAPSHOT.jar ./app.jar
+COPY --from=builder /app/target/auth-service-0.0.1-SNAPSHOT.jar ./app.jar
 
 # Expose the application ports (as per your Spring Boot config)
-EXPOSE 4001
-EXPOSE 9001
+EXPOSE 4005
+
 
 # Define the command to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
