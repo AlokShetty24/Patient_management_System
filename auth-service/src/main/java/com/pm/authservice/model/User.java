@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 
 import java.util.UUID;
 
-@Email
+@Entity
 @Table(name = "users")
 public class User {
     @Id

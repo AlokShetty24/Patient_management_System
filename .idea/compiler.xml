@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="auth-service" />
+        <module name="integration-test" />
         <module name="analytics_service" />
         <module name="Patient_service" />
         <module name="billing-service" />
